@@ -47,9 +47,11 @@ def load_handler(dummy):
 
 def register():
     bpy.app.handlers.load_post.append(load_handler)
+    load_handler(None)
 
 def unregister():
-	bpy.msgbus.clear_by_owner(handle)
+    bpy.app.handlers.load_post.remove(load_handler)
+    bpy.msgbus.clear_by_owner(handle)
  
 if __name__ == "__main__":
     register()
