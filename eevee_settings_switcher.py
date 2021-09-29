@@ -13,6 +13,7 @@ bl_info = {
 }
 
 import bpy
+from bpy.app.handlers import persistent
     
 handle = object()
 
@@ -32,14 +33,20 @@ def notify_test(*args):
         bpy.context.scene.eevee.use_gtao = True
         bpy.context.scene.eevee.use_ssr = True
 
+@persistent
+def load_handler(dummy):
+    subscribe_to=bpy.types.View3DShading
+    bpy.msgbus.subscribe_rna(
+        key=subscribe_to,
+        owner=handle,
+        args=(),
+        notify=notify_test,
+        options={"PERSISTENT"}
+    )
+    #bpy.msgbus.publish_rna(key=subscribe_to)
+
 def register():
-	bpy.msgbus.subscribe_rna(
-	    key=bpy.types.View3DShading,
-	    owner=handle,
-	    args=(),
-	    notify=notify_test,
-	)
-	#bpy.msgbus.publish_rna(key=subscribe_to)
+    bpy.app.handlers.load_post.append(load_handler)
 
 def unregister():
 	bpy.msgbus.clear_by_owner(handle)
